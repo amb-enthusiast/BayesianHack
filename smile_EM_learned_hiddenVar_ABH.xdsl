@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<smile version="1.0" id="Unnamed" numsamples="1000" discsamples="10000">
+	<nodes>
+		<cpt id="H">
+			<state id="h0" />
+			<state id="h1" />
+			<probabilities>0.5975940636034268 0.4024059363965732</probabilities>
+		</cpt>
+		<cpt id="A">
+			<state id="a0" />
+			<state id="a1" />
+			<parents>H</parents>
+			<probabilities>0.9112605319353897 0.08873946806461035 0.0963441280211038 0.9036558719788963</probabilities>
+		</cpt>
+		<cpt id="B">
+			<state id="b0" />
+			<state id="b1" />
+			<parents>H</parents>
+			<probabilities>0.9111523720681848 0.08884762793181525 0.09650475113501854 0.9034952488649816</probabilities>
+		</cpt>
+	</nodes>
+	<extensions>
+		<genie version="1.0" app="SMILE Mar  6 2013" name="Unnamed" faultnameformat="nodestate">
+			<node id="A">
+				<name>A</name>
+				<interior color="e5f6f7" />
+				<outline color="0000bb" />
+				<font color="000000" name="MS Sans Serif" size="8" />
+				<position>-38 -18 38 18</position>
+			</node>
+			<node id="B">
+				<name>B</name>
+				<interior color="e5f6f7" />
+				<outline color="0000bb" />
+				<font color="000000" name="MS Sans Serif" size="8" />
+				<position>-38 -18 38 18</position>
+			</node>
+			<node id="H">
+				<name>H</name>
+				<interior color="e5f6f7" />
+				<outline color="0000bb" />
+				<font color="000000" name="MS Sans Serif" size="8" />
+				<position>-38 -18 38 18</position>
+			</node>
+		</genie>
+	</extensions>
+</smile>
