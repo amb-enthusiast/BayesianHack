@@ -27,18 +27,21 @@ Both the GRMM and SamIam examples run "as is" - that is, you should just be able
 The SMILE example uses JSmile, the JNI interface for the C++ SMILE library.
 
 
-In order to execute the code, you will need to download SMILE binaries and the JSmile JNI files from the SMILE website (here)
-Next, you will need to edit environment PATH var to include the SMILE C++ binaries.
-The Maven config contains the -Djava.library.path runtime argument.  It is currently set to /path/to/smile/JNI/ so you will need to change this to point to the directory on your sstem that includes the JNI files for JSmile.
+In order to execute the code, you will need to download SMILE binaries and the JSmile JNI files from the SMILE website:
+http://genie.sis.pitt.edu/index.php/about
 
-Required data (simple CSV) and initial model files (a SamIam .net file) are includes in the resources directory.
+
+Next, you will need to edit your environment PATH var to include the SMILE C++ binaries.
+The Maven config for the project contains the -Djava.library.path runtime argument.  It is currently set to /path/to/smile/JNI/ - you will need to change this to point to the directory on your system that includes the JNI files for JSmile.
+
+Required data (simple CSV) and initial model files (a SamIam .net file) are includes in the src/main/resources directory.
 
 
 ### Observations
 
 GRMM - I used the factor operations in GRMM to implement EM on this model.  This is pretty neat, but a little cumbersome to get set up and difficult to generalise.
 
-SAMIAM - I found that the iteration and thresholding didn't work (or at least I couldn't set it up correctly) so I wrote my own iteration loop.  This did require writing out network files and reseting the LearningData object in each iteration.  I've mailed the SamIam team, but had no response as yet.
+SAMIAM - I found that the iteration and thresholding didn't work (or at least I couldn't set it up correctly) so I wrote my own iteration loop.  This did require writing out network files to disk and resetting the LearningData object in each iteration (ouch!).  I've mailed the SamIam team, but had no response as yet.
 
 The results from GRMM and SamIam agreed with my hand-crafted calculations - the values described in the tutorial.
 
