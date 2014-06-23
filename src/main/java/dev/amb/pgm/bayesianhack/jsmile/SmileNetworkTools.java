@@ -2,8 +2,6 @@ package dev.amb.pgm.bayesianhack.jsmile;
 
 import java.awt.Color;
 import java.io.File;
-import java.io.IOException;
-import java.net.URISyntaxException;
 
 import smile.Network;
 import smile.SMILEException;
@@ -65,8 +63,10 @@ public class SmileNetworkTools {
             // Set up and config EM
             EM em = new EM();
             em.setEqSampleSize(0);
-            em.setRandomizeParameters(true);
-            em.setSeed(SEED_VALUE);
+            
+            em.setRandomizeParameters(false);
+            em.setUniformizeParameters(false);
+            em.setRelevance(false);
             
             em.learn(data, network, data.matchNetwork(network));
             
@@ -94,22 +94,36 @@ public class SmileNetworkTools {
 
         try {
             Network net = new Network();
-
+            
             net.addNode(Network.NodeType.Cpt, "A");
             net.setOutcomeId("A", 0, "a0");
             net.setOutcomeId("A", 1, "a1");
-
+            
             net.addNode(Network.NodeType.Cpt, "B");
             net.setOutcomeId("B", 0, "b0");
             net.setOutcomeId("B", 1, "b1");
-
+            
+            
+            
+            
             net.addNode(Network.NodeType.Cpt, "H");
             net.setOutcomeId("H", 0, "h0");
             net.setOutcomeId("H", 1, "h1");
-
+            
             net.addArc("H", "A");
             net.addArc("H", "B");
-
+            
+            double[] defnA = { 0.39d , 0.45d , 0.61d , 0.55d};
+            double[] defnB = { 0.48d , 0.57d , 0.52d , 0.43d };
+            double[] defnH = { 0.6d , 0.4d };
+            
+            net.setNodeDefinition("A" , defnA);
+            net.setNodeDefinition("B" , defnB);
+            net.setNodeDefinition("H", defnH);
+            
+            System.out.println("Created inital JSmile BN:\n" + net.writeString());
+            
+            
             return net;
 
         } catch (Exception e) {
