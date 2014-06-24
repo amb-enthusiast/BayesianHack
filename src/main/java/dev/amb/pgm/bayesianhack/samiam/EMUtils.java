@@ -2,7 +2,6 @@ package dev.amb.pgm.bayesianhack.samiam;
 
 import edu.ucla.belief.BeliefNetwork;
 import edu.ucla.belief.EliminationHeuristic;
-import edu.ucla.belief.Variable;
 import edu.ucla.belief.inference.HuginEngineGenerator;
 import edu.ucla.belief.inference.JoinTreeSettings;
 import edu.ucla.belief.io.NetworkIO;
@@ -10,7 +9,6 @@ import edu.ucla.belief.io.PropertySuperintendent;
 import edu.ucla.belief.learn.Learning;
 import edu.ucla.belief.learn.LearningData;
 import java.io.File;
-import java.io.IOException;
 
 
 /**
