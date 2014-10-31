@@ -49,7 +49,7 @@ The results from GRMM and SamIam agreed with my hand-crafted calculations - the 
 SMILE - The documentation of Smile and JSmile is a little sparse, though there is enough to get going.  However, the resultant learned CPTs did not match GRMM, SamIam or the tutorial values.... there is not enough info on the site to easily understand what is going on.  I posted to the JSmile forum and got some useful info here:
 * http://genie.sis.pitt.edu/forum/viewtopic.php?f=2&t=1098
 
-Dimple - TBC!
+Dimple - Created a Dimple example of EM, following .  Results agree with hand calcs, GRMM and SAMIAM Results, which is cool.
 
 
 If anyone has any advice, improvements or suggestions on how best to use these libraries, I'd be grateful to hear it!
