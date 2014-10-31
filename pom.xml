@@ -27,11 +27,6 @@
       <version>2.0.7</version>
     </dependency>
     <dependency>
-      <groupId>edu.ucla.belief</groupId>
-      <artifactId>samiamInference</artifactId>
-      <version>3.0</version>
-    </dependency>
-    <dependency>
       <groupId>smile</groupId>
       <artifactId>jsmile_macosx_64</artifactId>
       <version>1.0</version>
@@ -91,6 +86,11 @@
       <groupId>colt</groupId>
       <artifactId>colt</artifactId>
       <version>1.2.0</version>
+    </dependency>
+    <dependency>
+      <groupId>edu.ucla.belief</groupId>
+      <artifactId>samiam</artifactId>
+      <version>3.0</version>
     </dependency>
   </dependencies>
 </project>
