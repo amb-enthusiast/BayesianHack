@@ -56,6 +56,8 @@ public class App_DimpleProbability {
             }
         }
         
+        FactorGraph g = new FactorGraph();
+        
         for(String varName : validVariableNames) {
             
             VariableBase var = bn.getVariableByName(varName);
@@ -69,7 +71,9 @@ public class App_DimpleProbability {
                     // get factor variable list
                     VariableBase[] allVars = new VariableBase[7];
                     
-                    f.replaceVariablesWithJoint(allVars, var);
+                    f.replaceVariablesWithJoint(f.getSiblings().toArray(new VariableBase[0]), var);
+                    
+                    // TODO do we need to build a new FactorGraph???
                     
                 }
                 
@@ -79,15 +83,8 @@ public class App_DimpleProbability {
         }
         
         
+        return bn;
         
-        
-        
-        return null;
-        
-    }
-    
-    public static VariableBase sdg(){
-        return null;
     }
     
     
