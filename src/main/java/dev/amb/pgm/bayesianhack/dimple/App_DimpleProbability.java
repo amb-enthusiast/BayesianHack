@@ -24,7 +24,7 @@ public class App_DimpleProbability {
 
     
     
-    public static FactorGraph marginailseOutVariables(FactorGraph bn , String... variableNamesToMarginaliseOut) {
+    public static FactorGraph marginaliseOutVariables(FactorGraph bn , String... variableNamesToMarginaliseOut) {
         
         // Hmm.. we can readily get the marginals for each variable, but can we get a new FactorGraph, where we have marginalised out the requested variables?
         
