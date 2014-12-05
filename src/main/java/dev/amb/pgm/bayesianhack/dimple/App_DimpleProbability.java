@@ -228,10 +228,8 @@ public class App_DimpleProbability {
     // Can we just do Factor manipulation as a last resort?
     
     
-    // Here is code for param estimation from GitHub
+    // Here is code for param estimation from GitHub, unpick this for details
     /*
-    
-    https://raw.githubusercontent.com/AnalogDevicesLyricLabs/dimple/7b9a5b68f51644594793eef65ef1dbc89344dae4/solvers/java/src/main/java/com/analog/lyric/dimple/solvers/core/ParameterEstimator.java
     
 *   Copyright 2013 Analog Devices, Inc.
 *
@@ -247,24 +245,7 @@ public class App_DimpleProbability {
 *   See the License for the specific language governing permissions and
 *   limitations under the License.
 
-        package com.analog.lyric.dimple.solvers.core;
 
-        import static java.util.Objects.*;
-
-        import java.util.ArrayList;
-        import java.util.HashMap;
-        import java.util.HashSet;
-        import java.util.Random;
-
-        import com.analog.lyric.collect.BitSetUtil;
-        import com.analog.lyric.dimple.exceptions.DimpleException;
-        import com.analog.lyric.dimple.factorfunctions.core.IFactorTable;
-        import com.analog.lyric.dimple.model.core.FactorGraph;
-        import com.analog.lyric.dimple.model.factors.Factor;
-        import com.analog.lyric.util.misc.Misc;
-
-        public abstract class ParameterEstimator
-        {
                 private FactorGraph _fg;
                 private IFactorTable [] _tables;
                 private Random _r;

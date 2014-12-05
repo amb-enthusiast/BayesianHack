@@ -13,6 +13,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Random;
 
 /**
  *
@@ -112,8 +113,9 @@ public class App_DimpleEM {
         
         // now we need to run baumWelch in such a way that the prob params are tied across the "timeslices"
         learningBN.setSolverFactory(new SumProductSolver());
-        learningBN.baumWelch(factorsToLearn, 1, 10);
+//        learningBN.baumWelch(factorsToLearn, 5, 50);
         
+        ParamEstimateHack.run(learningBN, factorsToLearn, 5, 50);
         
         
         // Now build standard BN from learned FactorTables
@@ -146,11 +148,17 @@ public class App_DimpleEM {
         System.out.println("\n*** Post baumWelch parameters::\n");
         
         
-        printBeliefs(result, "");
+        //printBeliefs(result, "");
+        printFactorBeliefs(result);
         
     }
 
     
+    public static void printFactorBeliefs(FactorGraph fg) {
+        for(Factor f : fg.getFactors()) {
+            System.out.println("\t" + f.getName() + " weights = " + Arrays.toString(f.getFactorTable().getWeightsSparseUnsafe()) );
+        }
+    }
     
     public static void printBeliefs(FactorGraph fg, String varFamily) {
         for(VariableBase var : fg.getVariables()) {
