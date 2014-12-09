@@ -58,9 +58,11 @@ public class App_DimpleProbability {
             }
         }
         
-        System.out.println("\n****\nNow setting Grade = A...\n");
+        String evidenceVarName = "Grade";
+        String evidenceValue = "C";
+        System.out.println("\n****\nNow setting " + evidenceVarName + " = " + evidenceValue + "...\n");
         
-        setEvidence(model, "Grade", "C");
+        setEvidence(model, evidenceVarName, evidenceValue);
         
         
         System.out.println("Updated marginal beliefs::\n");
