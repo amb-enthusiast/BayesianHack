@@ -2,7 +2,6 @@
 package dev.amb.pgm.bayesianhack.dimple;
 
 import com.analog.lyric.collect.BitSetUtil;
-import com.analog.lyric.dimple.exceptions.DimpleException;
 import com.analog.lyric.dimple.factorfunctions.core.IFactorTable;
 import com.analog.lyric.dimple.model.core.FactorGraph;
 import com.analog.lyric.dimple.model.factors.Factor;
@@ -48,6 +47,24 @@ public class ParamEstimateHack {
     private static HashMap<IFactorTable,ArrayList<Factor>> _table2factors;
     private static boolean _forceKeep;
 
+    
+    public static void setTableFactors(FactorGraph fg) {
+        
+        HashMap<IFactorTable,ArrayList<Factor>> table2factors = new HashMap<IFactorTable, ArrayList<Factor>>();
+
+        for (Factor f  : fg.getFactorsFlat())
+        {
+            IFactorTable ft = f.getFactorTable();
+            if (! table2factors.containsKey(ft))
+            {
+                    table2factors.put(ft,new ArrayList<Factor>());
+            }
+            table2factors.get(ft).add(f);
+        }
+
+        //Verify directionality is consistent.
+        _table2factors = table2factors;
+    }
     
     
     public static void setParameterEstimator(FactorGraph fg, IFactorTable [] tables, Random r)
@@ -240,7 +257,9 @@ public class ParamEstimateHack {
 
     public static void runStep(FactorGraph fg)
     {
-        
+        if(getTable2Factors() == null || getTable2Factors().keySet() == null) {
+            setTableFactors(fg);
+        }
         //run BP
         fg.solve();
 

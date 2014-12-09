@@ -32,11 +32,6 @@
       <version>1.0</version>
     </dependency>
     <dependency>
-      <groupId>com.analog.lyric.dimple</groupId>
-      <artifactId>dimple</artifactId>
-      <version>0.06</version>
-    </dependency>
-    <dependency>
       <groupId>commons-collections</groupId>
       <artifactId>commons-collections</artifactId>
       <version>3.2.1</version>
@@ -91,6 +86,11 @@
       <groupId>edu.ucla.belief</groupId>
       <artifactId>samiam</artifactId>
       <version>3.0</version>
+    </dependency>
+    <dependency>
+      <groupId>com.analog.lyric.dimple</groupId>
+      <artifactId>dimple</artifactId>
+      <version>0.06</version>
     </dependency>
   </dependencies>
 </project>
