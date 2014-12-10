@@ -9,7 +9,10 @@ import com.analog.lyric.dimple.model.factors.Factor;
 import com.analog.lyric.dimple.model.variables.Discrete;
 import com.analog.lyric.dimple.model.variables.VariableBase;
 import com.analog.lyric.dimple.solvers.sumproduct.SumProductSolver;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
 
 /**
  *
@@ -27,17 +30,71 @@ public class App_DimpleProbability {
 
     
     public static void main(String[] args){
+ 
+        //testSetEvidence();
         
-        // Build a factor over 3 binary vars
-        /*
+        FactorGraph student = createStudentGraph();
         
-            X1        X2
-              \\     //
-               \\   //
-                 *  *
-                  X3
-        */
+        // create an assignment
+        HashMap<String, String> assignment = new HashMap<String, String>();
+        assignment.put("Difficulty" , "hard");
+        assignment.put("Intelligence" , "smart");
+        assignment.put("SAT" , "good");
+        assignment.put("Grade" , "B");
+        assignment.put("Letter" , "strong");
         
+        String probLabel = "P(";
+        for(String k : assignment.keySet()) {
+            probLabel = probLabel + " " + k + "=" + assignment.get(k);
+        }
+        Double probValue = probabilityOfJointAssignment(student, assignment);
+        
+        System.out.println(probLabel + ")=" + probValue);
+        
+        Double probTotal = null;
+        
+        for(String a : student.getVariableByName("Difficulty").asDiscreteVariable().getDiscreteDomain().getElements(new String[0])) {
+            for(String b : student.getVariableByName("Intelligence").asDiscreteVariable().getDiscreteDomain().getElements(new String[0])) {
+                for(String c : student.getVariableByName("SAT").asDiscreteVariable().getDiscreteDomain().getElements(new String[0])) {
+                    for(String d : student.getVariableByName("Grade").asDiscreteVariable().getDiscreteDomain().getElements(new String[0])) {
+                        for(String e : student.getVariableByName("Letter").asDiscreteVariable().getDiscreteDomain().getElements(new String[0])) {
+                            HashMap<String, String> assign = new HashMap<String, String>();
+                            assign.put("Difficulty" , a);
+                            assign.put("Intelligence" , b);
+                            assign.put("SAT" , c);
+                            assign.put("Grade" , d);
+                            assign.put("Letter" , e);
+
+                            String assignLabel = "P(";
+                            for(String k : assign.keySet()) {
+                                assignLabel = assignLabel + " " + k + "=" + assign.get(k);
+                            }
+                            Double prob = probabilityOfJointAssignment(student, assign);
+                            System.out.println(assignLabel + ") = " + prob);
+                            
+                            if(probTotal == null) {
+                                probTotal = prob;
+                            } else {
+                                probTotal = probTotal + prob;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        System.out.println("\nSum of probabiltiies over all joint assignments = " + probTotal);
+        
+    }
+    
+    
+    
+    /*
+    
+    Here is where we hack around with Dimple to learn more about probabilistic queries
+    */
+    
+    
+    public static void testSetEvidence() {
         FactorGraph model = createStudentGraph();
         System.out.println("Created the Student model, now running inference to get marginal probs...\n");
         
@@ -83,16 +140,137 @@ public class App_DimpleProbability {
             }
         }
         
-        
     }
     
     
     
-    /*
+    public static Double probabilityOfJointAssignment(FactorGraph model , HashMap<String, String> assignment) {
+        if(model == null) {
+            return null;
+        }
+        if(assignment == null) {
+            return null;
+        }
+        if(model.getVariableCount() == 0) {
+            return null;
+        }
+        if(model.getFactorCount() == 0) {
+            return null;
+        }
+        if(assignment.isEmpty()) {
+            return null;
+        }
+        if(model.getVariableCount() != assignment.size()) {
+            return null;
+        }
+        
+        // makes sure the variables match up
+        boolean match = false;
+        for(VariableBase v : model.getVariables()) {
+            for(String varName : assignment.keySet()) {
+        
+                if(v.getName().equals(varName)) {
+                    match = true;
+                    break;
+                }
+            }
+        }
+        if(match == false) {
+            return null;
+        }
+        
+        
+        // Split the model up into factors and their related variables
+        HashMap<Factor, ArrayList<Discrete>> factorVariables = new HashMap<Factor, ArrayList<Discrete>>();
+        
+        for(Factor f : model.getFactors()) {
+            
+            ArrayList<Discrete> factorVars = new ArrayList<Discrete>();
+            
+            for(VariableBase v : f.getSiblings()) {
+                factorVars.add(v.asDiscreteVariable());
+            }
+            factorVariables.put(f, factorVars);
+            
+        }
+        
+        
+        // Now we know what vars are in each factor, we can get the correct index
+        // look up the CPT weights, and then multiply up (well, take logs and add to avoid underflow)
+        
+        Double logProb = null;
+        
+        for(Factor f : factorVariables.keySet()) {
+            
+            
+            String[] orderedValues = new String[f.getSiblingCount()];
+            
+            for(int idx = 0 ; idx < f.getSiblingCount(); idx++) {
+                for(Discrete var : factorVariables.get(f)) {
+                    
+                    if(f.getSibling(idx).getName().equals(var.getName())) {
+                        orderedValues[idx] = assignment.get(var.getName());
+                        break;
+                    }
+                }
+                
+            }
+            
+            // now get the index for the assignment
+            int jointIdx = f.getFactorTable().getDomainIndexer().jointIndexFromElements((Object[]) orderedValues);
+            
+            // now accumulate the probability value
+            Double prob = f.getFactorTable().getWeightForJointIndex(jointIdx);
+            if(logProb == null) {
+                logProb = Math.log(prob);
+            } else {
+                logProb = logProb + Math.log(prob);
+            }
+        }
+        
+        return Math.exp(logProb);
+    }
     
-    Here is where we hack around with Dimple to learn more about probabilistic queries
-    */
-    
+    public static Factor marginaliseVariables(Factor factor , Discrete... variablesToMarginaliseOut ) {
+        
+        if(factor == null) {
+            return null;
+        }
+        if(variablesToMarginaliseOut == null) {
+            return factor;
+        }
+        if(factor.getSiblingCount() == 0) {
+            return null;
+        }
+        if(variablesToMarginaliseOut.length == 0) {
+            return null;
+        }
+        if(variablesToMarginaliseOut.length > factor.getSiblingCount()) {
+            //WARN that there are more vars to marginalise out than are in the model!
+            return null;
+        }
+        
+        HashSet<Discrete> modelVarsToMarginalise = new HashSet<Discrete>();
+        HashSet<Discrete> modelVarsToKeep = new HashSet<Discrete>();
+        
+        for(Discrete marVar : variablesToMarginaliseOut) {
+            for(VariableBase v : factor.getSiblings()) {
+                Discrete modelVar = v.asDiscreteVariable();
+                if(marVar.getName().equals(modelVar.getName()) || marVar.equals(modelVar)) {
+                    modelVarsToMarginalise.add(modelVar);
+                    break;
+                } else {
+                    modelVarsToKeep.add(modelVar);
+                    break;
+                }
+            }
+        }
+        
+        // reduce Factor to one over, having summed out and renormalised over vars to marginalise
+        
+        
+        return null;
+    }
     
     public static FactorGraph setEvidence(FactorGraph fg , String variableName, Object variableValue) {
         
