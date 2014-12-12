@@ -2,7 +2,9 @@
 package dev.amb.pgm.bayesianhack.dimple;
 
 
+import com.analog.lyric.dimple.factorfunctions.core.FactorTableEntry;
 import com.analog.lyric.dimple.factorfunctions.core.IFactorTable;
+import com.analog.lyric.dimple.factorfunctions.core.IFactorTableIterator;
 import com.analog.lyric.dimple.model.core.FactorGraph;
 import com.analog.lyric.dimple.model.domains.DiscreteDomain;
 import com.analog.lyric.dimple.model.factors.Factor;
@@ -30,59 +32,12 @@ public class App_DimpleProbability {
 
     
     public static void main(String[] args){
- 
-        //testSetEvidence();
         
-        FactorGraph student = createStudentGraph();
+        FactorGraph model = createStudentGraph();
         
-        // create an assignment
-        HashMap<String, String> assignment = new HashMap<String, String>();
-        assignment.put("Difficulty" , "hard");
-        assignment.put("Intelligence" , "smart");
-        assignment.put("SAT" , "good");
-        assignment.put("Grade" , "B");
-        assignment.put("Letter" , "strong");
+        Factor f = model.getFactorByName("P(G | I, D)");
         
-        String probLabel = "P(";
-        for(String k : assignment.keySet()) {
-            probLabel = probLabel + " " + k + "=" + assignment.get(k);
-        }
-        Double probValue = probabilityOfJointAssignment(student, assignment);
-        
-        System.out.println(probLabel + ")=" + probValue);
-        
-        Double probTotal = null;
-        
-        for(String a : student.getVariableByName("Difficulty").asDiscreteVariable().getDiscreteDomain().getElements(new String[0])) {
-            for(String b : student.getVariableByName("Intelligence").asDiscreteVariable().getDiscreteDomain().getElements(new String[0])) {
-                for(String c : student.getVariableByName("SAT").asDiscreteVariable().getDiscreteDomain().getElements(new String[0])) {
-                    for(String d : student.getVariableByName("Grade").asDiscreteVariable().getDiscreteDomain().getElements(new String[0])) {
-                        for(String e : student.getVariableByName("Letter").asDiscreteVariable().getDiscreteDomain().getElements(new String[0])) {
-                            HashMap<String, String> assign = new HashMap<String, String>();
-                            assign.put("Difficulty" , a);
-                            assign.put("Intelligence" , b);
-                            assign.put("SAT" , c);
-                            assign.put("Grade" , d);
-                            assign.put("Letter" , e);
-
-                            String assignLabel = "P(";
-                            for(String k : assign.keySet()) {
-                                assignLabel = assignLabel + " " + k + "=" + assign.get(k);
-                            }
-                            Double prob = probabilityOfJointAssignment(student, assign);
-                            System.out.println(assignLabel + ") = " + prob);
-                            
-                            if(probTotal == null) {
-                                probTotal = prob;
-                            } else {
-                                probTotal = probTotal + prob;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        System.out.println("\nSum of probabiltiies over all joint assignments = " + probTotal);
+        removeAssignment(f);
         
     }
     
@@ -142,6 +97,63 @@ public class App_DimpleProbability {
         
     }
     
+    
+    public static void testJointProbability() {
+        
+        //testSetEvidence();
+        
+        FactorGraph student = createStudentGraph();
+        
+        // create an assignment
+        HashMap<String, String> assignment = new HashMap<String, String>();
+        assignment.put("Difficulty" , "hard");
+        assignment.put("Intelligence" , "smart");
+        assignment.put("SAT" , "good");
+        assignment.put("Grade" , "B");
+        assignment.put("Letter" , "strong");
+        
+        String probLabel = "P(";
+        for(String k : assignment.keySet()) {
+            probLabel = probLabel + " " + k + "=" + assignment.get(k);
+        }
+        Double probValue = probabilityOfJointAssignment(student, assignment);
+        
+        System.out.println(probLabel + ")=" + probValue);
+        
+        Double probTotal = null;
+        
+        for(String a : student.getVariableByName("Difficulty").asDiscreteVariable().getDiscreteDomain().getElements(new String[0])) {
+            for(String b : student.getVariableByName("Intelligence").asDiscreteVariable().getDiscreteDomain().getElements(new String[0])) {
+                for(String c : student.getVariableByName("SAT").asDiscreteVariable().getDiscreteDomain().getElements(new String[0])) {
+                    for(String d : student.getVariableByName("Grade").asDiscreteVariable().getDiscreteDomain().getElements(new String[0])) {
+                        for(String e : student.getVariableByName("Letter").asDiscreteVariable().getDiscreteDomain().getElements(new String[0])) {
+                            HashMap<String, String> assign = new HashMap<String, String>();
+                            assign.put("Difficulty" , a);
+                            assign.put("Intelligence" , b);
+                            assign.put("SAT" , c);
+                            assign.put("Grade" , d);
+                            assign.put("Letter" , e);
+
+                            String assignLabel = "P(";
+                            for(String k : assign.keySet()) {
+                                assignLabel = assignLabel + " " + k + "=" + assign.get(k);
+                            }
+                            Double prob = probabilityOfJointAssignment(student, assign);
+                            System.out.println(assignLabel + ") = " + prob);
+                            
+                            if(probTotal == null) {
+                                probTotal = prob;
+                            } else {
+                                probTotal = probTotal + prob;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        System.out.println("\nSum of probabiltiies over all joint assignments = " + probTotal);
+        
+    }
     
     
     public static Double probabilityOfJointAssignment(FactorGraph model , HashMap<String, String> assignment) {
@@ -231,6 +243,7 @@ public class App_DimpleProbability {
         return Math.exp(logProb);
     }
     
+    
     public static Factor marginaliseVariables(Factor factor , Discrete... variablesToMarginaliseOut ) {
         
         if(factor == null) {
@@ -253,6 +266,11 @@ public class App_DimpleProbability {
         HashSet<Discrete> modelVarsToMarginalise = new HashSet<Discrete>();
         HashSet<Discrete> modelVarsToKeep = new HashSet<Discrete>();
         
+        // need to create a new factorTable that has the correct variables, and is
+        // conditionally normalised against the correct variable
+        
+        
+        
         for(Discrete marVar : variablesToMarginaliseOut) {
             for(VariableBase v : factor.getSiblings()) {
                 Discrete modelVar = v.asDiscreteVariable();
@@ -271,6 +289,7 @@ public class App_DimpleProbability {
         
         return null;
     }
+    
     
     public static FactorGraph setEvidence(FactorGraph fg , String variableName, Object variableValue) {
         
@@ -350,6 +369,36 @@ public class App_DimpleProbability {
         }
         
         return fg;
+        
+    }
+    
+    
+    // Learn more about the indexing mechanisms in Dimple FactorTables
+    public static void removeAssignment(Factor f) {
+        if(f == null) {
+            System.out.println("The input factor is null; fix and try again.");
+            return;
+        }
+        
+        if(f.getSiblingCount()== 0) {
+            System.out.println("The input factor has 0 variables; fix and try again.");
+            return;
+        }
+        
+        // Just run through the factor table to see the entries
+        
+        IFactorTable ft = f.getFactorTable();
+        
+        IFactorTableIterator iterator1 = ft.fullIterator();
+        
+        System.out.println("Inspecting assignments in " + f.getName());
+        
+        while(iterator1.hasNext()) {
+            FactorTableEntry entry = iterator1.next();
+            
+            System.out.println("\t" + "jointIdx = " + entry.jointIndex() + ", values = " + Arrays.toString(entry.values(new String[0])) + " Prob=" + ft.getWeightForJointIndex(entry.jointIndex()));
+        }
+        
         
     }
     
