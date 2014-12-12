@@ -409,12 +409,32 @@ public class App_DimpleProbability {
 //        }
         IFactorTable newFT = FactorTable.create(ft.getDomainIndexer().get(1) , ft.getDomainIndexer().get(2));
         
-        // Now iterate over the assignments and exmaine the values before we set any!
+        // Now iterate over the assignments and exmaine the values before we set any... check they are zero
         IFactorTableIterator iterator2 = newFT.fullIterator();
         while(iterator2.hasNext()) {
             FactorTableEntry entry = iterator2.next();
             System.out.println("\tidx=" + entry.jointIndex() + " " + Arrays.toString(entry.values(new String[0])) + " , value=" + newFT.getWeightForJointIndex(entry.jointIndex()));
         }
+        
+        // lets just grab some values from the original factor table:
+        System.out.println("\nSetting new values in reduced factorTable");
+        IFactorTableIterator iterator3 = newFT.fullIterator();
+        while(iterator3.hasNext()) {
+            FactorTableEntry e = iterator3.next();
+            newFT.setWeightForJointIndex(ft.getWeightForJointIndex(e.jointIndex()), e.jointIndex());
+            System.out.println("\tNew value = " + newFT.getWeightForJointIndex(e.jointIndex()));
+        }
+        
+        
+        // IF we just normalise() the values, the table sums to 1
+        
+        
+        // IF we normaliseConditional()
+        
+        
+        
+        // lets say that we want to sum out the values from variable0, and then use these values in the new FactorTable...
+        
         
     }
     
