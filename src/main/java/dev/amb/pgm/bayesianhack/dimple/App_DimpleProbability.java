@@ -2,6 +2,7 @@
 package dev.amb.pgm.bayesianhack.dimple;
 
 
+import com.analog.lyric.dimple.factorfunctions.core.FactorTable;
 import com.analog.lyric.dimple.factorfunctions.core.FactorTableEntry;
 import com.analog.lyric.dimple.factorfunctions.core.IFactorTable;
 import com.analog.lyric.dimple.factorfunctions.core.IFactorTableIterator;
@@ -399,6 +400,21 @@ public class App_DimpleProbability {
             System.out.println("\t" + "jointIdx = " + entry.jointIndex() + ", values = " + Arrays.toString(entry.values(new String[0])) + " Prob=" + ft.getWeightForJointIndex(entry.jointIndex()));
         }
         
+        System.out.println("Creating a new FactorTable with domain 0 - the domain at idx=0, corresponding to variable @ idx=0.\nRemoved:" +
+                Arrays.toString(ft.getDomainIndexer().get(0).getElements(new String[0])));
+        
+//        DiscreteDomain[] newDomains = new DiscreteDomain[f.getSiblingCount()-1];
+//        for(int idx = 1; idx < f.getSiblingCount()-1;idx++) {
+//            newDomains[idx] = ft.getDomainIndexer().get(idx);
+//        }
+        IFactorTable newFT = FactorTable.create(ft.getDomainIndexer().get(1) , ft.getDomainIndexer().get(2));
+        
+        // Now iterate over the assignments and exmaine the values before we set any!
+        IFactorTableIterator iterator2 = newFT.fullIterator();
+        while(iterator2.hasNext()) {
+            FactorTableEntry entry = iterator2.next();
+            System.out.println("\tidx=" + entry.jointIndex() + " " + Arrays.toString(entry.values(new String[0])) + " , value=" + newFT.getWeightForJointIndex(entry.jointIndex()));
+        }
         
     }
     
