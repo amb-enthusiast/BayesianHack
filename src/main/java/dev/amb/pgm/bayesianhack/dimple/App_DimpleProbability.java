@@ -2,6 +2,7 @@
 package dev.amb.pgm.bayesianhack.dimple;
 
 
+import com.analog.lyric.collect.BitSetUtil;
 import com.analog.lyric.dimple.factorfunctions.core.FactorTable;
 import com.analog.lyric.dimple.factorfunctions.core.FactorTableEntry;
 import com.analog.lyric.dimple.factorfunctions.core.IFactorTable;
@@ -14,6 +15,7 @@ import com.analog.lyric.dimple.model.variables.VariableBase;
 import com.analog.lyric.dimple.solvers.sumproduct.SumProductSolver;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.BitSet;
 import java.util.HashMap;
 import java.util.HashSet;
 
@@ -399,6 +401,8 @@ public class App_DimpleProbability {
             
             System.out.println("\t" + "jointIdx = " + entry.jointIndex() + ", values = " + Arrays.toString(entry.values(new String[0])) + " Prob=" + ft.getWeightForJointIndex(entry.jointIndex()));
         }
+        iterator1 = null;
+        
         
         System.out.println("Creating a new FactorTable with domain 0 - the domain at idx=0, corresponding to variable @ idx=0.\nRemoved:" +
                 Arrays.toString(ft.getDomainIndexer().get(0).getElements(new String[0])));
@@ -415,6 +419,7 @@ public class App_DimpleProbability {
             FactorTableEntry entry = iterator2.next();
             System.out.println("\tidx=" + entry.jointIndex() + " " + Arrays.toString(entry.values(new String[0])) + " , value=" + newFT.getWeightForJointIndex(entry.jointIndex()));
         }
+        iterator2 = null;
         
         // lets just grab some values from the original factor table:
         System.out.println("\nSetting new values in reduced factorTable");
@@ -422,19 +427,90 @@ public class App_DimpleProbability {
         while(iterator3.hasNext()) {
             FactorTableEntry e = iterator3.next();
             newFT.setWeightForJointIndex(ft.getWeightForJointIndex(e.jointIndex()), e.jointIndex());
-            System.out.println("\tNew value = " + newFT.getWeightForJointIndex(e.jointIndex()));
+            System.out.println("\t" + Arrays.toString(e.values(new String[0])) + " value = " + newFT.getWeightForJointIndex(e.jointIndex()));
         }
-        
+        iterator3 = null;
         
         // IF we just normalise() the values, the table sums to 1
+        newFT.normalize();
+        
+        
+        double sum = 0.0d;
+        System.out.println("\nNormalised the values; should sum to 1 over all entries:");
+        IFactorTableIterator iterator4 = newFT.fullIterator();
+        while(iterator4.hasNext()) {
+            FactorTableEntry e = iterator4.next();
+            sum = sum + newFT.getWeightForJointIndex(e.jointIndex());
+            System.out.println("\t" + Arrays.toString(e.values(new String[0])) + " value = " + newFT.getWeightForJointIndex(e.jointIndex()));
+        }
+        System.out.println("Sum of values over newFT enties = " + sum);
+        iterator4 = null;
+        
         
         
         // IF we normaliseConditional()
+        double conditionalSum = 0.0d;
+        System.out.println("\nSeek to make the table conditional on the first variable:");
+        
+        BitSet var1_bitSet = BitSetUtil.bitsetFromIndices(2, 0);
+        
+        newFT.setDirected(var1_bitSet);
+        
+        newFT.normalizeConditional();
+        
+        IFactorTableIterator iterator5 = newFT.fullIterator();
+        while(iterator5.hasNext()) {
+            FactorTableEntry e = iterator5.next();
+            conditionalSum = conditionalSum + newFT.getWeightForJointIndex(e.jointIndex());
+            System.out.println("\t" + Arrays.toString(e.values(new String[0])) + " value = " + newFT.getWeightForJointIndex(e.jointIndex()));
+        }
+        System.out.println("Sum of values over conditioned newFT entries = " + conditionalSum);
+        iterator5 = null;
+        var1_bitSet = null;
+        
+        
+        double conditionalSum2 = 0.0d;
+        System.out.println("\nSeek to make the table conditional on the second variable:");
+        
+        BitSet var2_bitSet = BitSetUtil.bitsetFromIndices(2, 1);
+        
+        newFT.setDirected(var2_bitSet);
+        
+        newFT.normalizeConditional();
+        
+        IFactorTableIterator iterator6 = newFT.fullIterator();
+        while(iterator6.hasNext()) {
+            FactorTableEntry e = iterator6.next();
+            conditionalSum2 = conditionalSum2 + newFT.getWeightForJointIndex(e.jointIndex());
+            System.out.println("\t" + Arrays.toString(e.values(new String[0])) + " value = " + newFT.getWeightForJointIndex(e.jointIndex()));
+        }
+        System.out.println("Sum of values over conditioned newFT entries = " + conditionalSum2);
         
         
         
         // lets say that we want to sum out the values from variable0, and then use these values in the new FactorTable...
+        System.out.println("\nReturning to original FT:");
+        IFactorTableIterator iterator7 = ft.fullIterator();
         
+        System.out.println("Inspecting assignments in " + f.getName());
+        
+        while(iterator7.hasNext()) {
+            FactorTableEntry entry = iterator7.next();
+            System.out.println("\t" + "jointIdx = " + entry.jointIndex() + ", values = " + Arrays.toString(entry.values(new String[0])) + " Prob=" + ft.getWeightForJointIndex(entry.jointIndex()));
+        }
+        
+        System.out.println("Now taking weights slice at dimension0");
+        System.out.println("\tdim0, indexes 0 and 0: " + Arrays.toString(ft.getWeightSlice(0, 0, 0)));
+        System.out.println("\tdim0, indexes 0 and 1: " + Arrays.toString(ft.getWeightSlice(0, 0, 1)));
+        System.out.println("\tdim0, indexes 1 and 1: " + Arrays.toString(ft.getWeightSlice(0, 1, 1)));
+        
+        System.out.println("Now taking weights slice at dimension1");
+        System.out.println("\tdim1, indexes 0 and 0: " + Arrays.toString(ft.getWeightSlice(1, 0, 0)));
+        System.out.println("\tdim1, indexes 0 and 1: " + Arrays.toString(ft.getWeightSlice(1, 0, 1)));
+        System.out.println("\tdim1, indexes 1 and 1: " + Arrays.toString(ft.getWeightSlice(1, 1, 1)));
+        
+        
+        // getting the right weight slice we can then just sum the values to give a new entry
         
     }
     
